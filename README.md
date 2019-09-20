@@ -27,3 +27,16 @@ create docker-machine with created iso file
 ```cmd
 C:\home> sudo docker-machine create --driver hyperv --hyperv-virtual-switch hv-nat --hyperv-boot2docker-url boot2docker.cifs.iso default
 ```
+In Hyper-V manager, change virtual switch from 'hv-nat' to 'default switch'.
+Because defautl switch can provide dhcp/nat/dns server to vm.
+
+In boot2docker-cifs vm on Hyper-V:
+```bash
+sudo bash /opt/mnt_c.bash
+sudo df -h
+ls -F /c
+```
+
+Trouble:
+1) failed to acccess to server on created docker container.
+   check dnsserver lines in /etc/resolv.conf  
