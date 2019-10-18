@@ -101,6 +101,12 @@ RUN for package in $TCL_PACKAGES_EXTRA; do \
 	done; \
 	echo "finish"
 
+# max watcher
+RUN set -xeu && \
+  echo "fs.inotify.max_user_watches = 524288" >> /etc/sysctl.conf && \
+  sysctl -p
+
+
 RUN time make-b2d-iso.sh; \
 	du -hs /tmp/boot2docker.iso
 
