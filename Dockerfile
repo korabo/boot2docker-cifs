@@ -2,8 +2,8 @@
 # http://weblogs.com.pk/khurram/archive/2016/07/03/customized-boot2docker-iso-with-cifs.aspx with Fix
 # 1.0 ST(KRB/SPG)
 # way to Make
-# docker build --file Dockerfile --tag boot2docker:cifs ./
-# docker run --rm boot2docker:cifs > boot2docker.cifs.iso
+# docker build --file Dockerfile --tag korabo/boot2docker-cifs ./
+# docker run --env CIFS_USR=dockercifs --env CIFS_PSW=dockercifs --rm korabo/boot2docker-cifs:latest > boot2docker.cifs.iso
 # sudo docker-machine create --driver hyperv --hyperv-virtual-switch hv-nat --hyperv-boot2docker-url boot2docker.cifs.iso dkcifs
 # copied to C:\Users\s.takeuchi\.docker\machine\machines\default\boot2docker.iso
 # AFTER CREATED: replace virtual-switch, docker-machine regenerate-certs dkcifs, docker-machine env dkcifs
@@ -77,7 +77,7 @@ RUN  set -xeu && {\
      echo 'mount.cifs //${WinHost:-WindowsHostName}/c /c  -o "${CIFS_OPTS}"'; \
      echo 'echo "//${WinHost:-WindowsHostName}/c /c cifs ${CIFS_OPTS} 0 2" >> /etc/fstab'; \
      echo 'echo "nameserver 8.8.8.8" >> /etc/resolv.conf'; \
-     echo 'echo "nameserver 4.4.4.4" >> /etc/resolv.conf'; \
+     echo 'echo "nameserver 8.8.4.4" >> /etc/resolv.conf'; \
      echo 'if [[ -z $1 ]];then'; \
      echo '  echo "/opt/mnt_c.bash -run" > /var/lib/boot2docker/bootsync.sh'; \
      echo 'fi'; \
@@ -103,8 +103,7 @@ RUN for package in $TCL_PACKAGES_EXTRA; do \
 
 # max watcher
 RUN set -xeu && \
-  echo "fs.inotify.max_user_watches = 524288" >> /etc/sysctl.conf && \
-  sysctl -p
+  echo "fs.inotify.max_user_watches = 524288" >> $ROOTFS/etc/sysctl.conf
 
 
 RUN time make-b2d-iso.sh; \
