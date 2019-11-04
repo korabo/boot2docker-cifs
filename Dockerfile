@@ -117,4 +117,4 @@ COPY files/opt/mkiso.bash ./opt/
 RUN set -xeu && \
   chmod a+x ./opt/*.bash
 
-CMD ["sh", "-c", "[ -t 1 ] && exec bash || exec bash /opt/mkiso.bash"]
+CMD ["sh", "-c", "[ -t 1 ] && exec bash || exec bash ./opt/mkiso.bash"]
