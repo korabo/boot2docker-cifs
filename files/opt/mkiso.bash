@@ -8,6 +8,6 @@ password=${CIFS_PSW:-dockercifs}
 # domain=${CIFS_DMN:-CifsSvrDomainName}
 EOL
 
-time make-b2d-iso.sh
-du -hs /tmp/boot2docker.iso
+time make-b2d-iso.sh 1>&2
+du -hs /tmp/boot2docker.iso 1>&2
 cat /tmp/boot2docker.iso
