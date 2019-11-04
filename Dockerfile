@@ -8,6 +8,9 @@
 # copied to C:\Users\s.takeuchi\.docker\machine\machines\default\boot2docker.iso
 # AFTER CREATED: replace virtual-switch, docker-machine regenerate-certs dkcifs, docker-machine env dkcifs
 # In boot2dockercifs ; sudo bash /opt/mnt_c.bash
+
+# https://hub.docker.com/u/boot2docker
+# https://github.com/boot2docker/boot2docker
 FROM boot2docker/boot2docker
 
 #wget http://distro.ibiblio.org/tinycorelinux/5.x/x86/tcz/cifs-utils.tczRf
@@ -62,29 +65,31 @@ ENV ROOTFS /rootfs
 
 
 # Update MOTD
-RUN echo "#####################" >> $ROOTFS/etc/motd; \
-	echo "Boot2Docker with CIFS" >> $ROOTFS/etc/motd; \
-	echo "#####################" >> $ROOTFS/etc/motd
+RUN echo "#########################################" >> $ROOTFS/etc/motd; \
+	echo "##        Boot2Docker with CIFS        ##" >> $ROOTFS/etc/motd; \
+	echo "## for initialize exec below cmd once: ##" >> $ROOTFS/etc/motd; \
+	echo "##     sudo bash /opt/prepare.bash     ##" >> $ROOTFS/etc/motd; \
+	echo "#########################################" >> $ROOTFS/etc/motd
 	
-# create setup script /opt/mnt_c.bash for mount, dns, etc
-RUN  set -xeu && {\
-     echo '#!/usr/bin/env bash'; \
-     echo 'WIN_USR=$CIFS_USR'; \
-     echo 'WIN_PSW=$CIFS_PSW'; \
-	 echo "CIFS_OPTS=username=\${CIFS_USR},password=\${CIFS_PSW},vers=2.0,dir_mode=0777,file_mode=0777"; \
-     echo 'mkdir -p /c'; \
-     echo "WinHost=\$(netstat -r|awk '/^default/ {print \$2}'|sed -r 's/([^.]*)(\.|).*/\1/g')"; \
-     echo 'mount.cifs //${WinHost:-WindowsHostName}/c /c  -o "${CIFS_OPTS}"'; \
-     echo 'echo "//${WinHost:-WindowsHostName}/c /c cifs ${CIFS_OPTS} 0 2" >> /etc/fstab'; \
-     echo 'echo "nameserver 8.8.8.8" >> /etc/resolv.conf'; \
-     echo 'echo "nameserver 8.8.4.4" >> /etc/resolv.conf'; \
-     echo 'if [[ -z $1 ]];then'; \
-     echo '  echo "/opt/mnt_c.bash -run" > /var/lib/boot2docker/bootsync.sh'; \
-     echo 'fi'; \
-   } | tee $ROOTFS/opt/mnt_c.bash && \
-     chmod a+x $ROOTFS/opt/mnt_c.bash && \
-	#  to confirm script is good
-	 cat $ROOTFS/opt/mnt_c.bash
+# # create setup script /opt/mnt_c.bash for mount, dns, etc
+# RUN  set -xeu && {\
+#      echo '#!/usr/bin/env bash'; \
+#      echo 'WIN_USR=$CIFS_USR'; \
+#      echo 'WIN_PSW=$CIFS_PSW'; \
+# 	 echo "CIFS_OPTS=username=\${CIFS_USR},password=\${CIFS_PSW},vers=2.0,dir_mode=0777,file_mode=0777"; \
+#      echo 'mkdir -p /c'; \
+#      echo "WinHost=\$(netstat -r|awk '/^default/ {print \$2}'|sed -r 's/([^.]*)(\.|).*/\1/g')"; \
+#      echo 'mount.cifs //${WinHost:-WindowsHostName}/c /c  -o "${CIFS_OPTS}"'; \
+#      echo 'echo "//${WinHost:-WindowsHostName}/c /c cifs ${CIFS_OPTS} 0 2" >> /etc/fstab'; \
+#      echo 'echo "nameserver 8.8.8.8" >> /etc/resolv.conf'; \
+#      echo 'echo "nameserver 8.8.4.4" >> /etc/resolv.conf'; \
+#      echo 'if [[ -z $1 ]];then'; \
+#      echo '  echo "/opt/mnt_c.bash -run" > /var/lib/boot2docker/bootsync.sh'; \
+#      echo 'fi'; \
+#    } | tee $ROOTFS/opt/mnt_c.bash && \
+#      chmod a+x $ROOTFS/opt/mnt_c.bash && \
+# 	#  to confirm script is good
+# 	 cat $ROOTFS/opt/mnt_c.bash
  
 # install pkg for cifs mount
 ENV TCL_PACKAGES_EXTRA="samba-libs.tcz cifs-utils.tcz"
@@ -105,9 +110,11 @@ RUN for package in $TCL_PACKAGES_EXTRA; do \
 RUN set -xeu && \
   echo "fs.inotify.max_user_watches = 524288" >> $ROOTFS/etc/sysctl.conf
 
+COPY files/opt/mnt_c.bash ./opt/
+COPY files/opt/prepare.bash ./opt/
+COPY files/opt/mkiso.bash ./opt/
 
-RUN time make-b2d-iso.sh; \
-	du -hs /tmp/boot2docker.iso
+RUN set -xeu && \
+  chmod a+x ./opt/*.bash
 
-CMD ["sh", "-c", "[ -t 1 ] && exec bash || exec cat /tmp/boot2docker.iso"]
-
+CMD ["sh", "-c", "[ -t 1 ] && exec bash || exec bash /opt/mkiso.bash"]
