@@ -70,7 +70,7 @@ RUN echo "#########################################" >> $ROOTFS/etc/motd; \
 	echo "## for initialize exec below cmd once: ##" >> $ROOTFS/etc/motd; \
 	echo "##     sudo bash /opt/prepare.bash     ##" >> $ROOTFS/etc/motd; \
 	echo "#########################################" >> $ROOTFS/etc/motd
-	
+
 # # create setup script /opt/mnt_c.bash for mount, dns, etc
 # RUN  set -xeu && {\
 #      echo '#!/usr/bin/env bash'; \
@@ -90,9 +90,9 @@ RUN echo "#########################################" >> $ROOTFS/etc/motd; \
 #      chmod a+x $ROOTFS/opt/mnt_c.bash && \
 # 	#  to confirm script is good
 # 	 cat $ROOTFS/opt/mnt_c.bash
- 
+
 # install pkg for cifs mount
-ENV TCL_PACKAGES_EXTRA="samba-libs.tcz cifs-utils.tcz"
+ENV TCL_PACKAGES_EXTRA="samba.tcz samba-libs.tcz cifs-utils.tcz"
 # Get Packages samba-libs.tcz samba-client.tcz cifs-utils.tc
 RUN for package in $TCL_PACKAGES_EXTRA; do \
 		for mirror in $TCL_MIRRORS; do \
