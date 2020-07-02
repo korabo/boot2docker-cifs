@@ -63,24 +63,22 @@ password: egRL8gTsVts2JPgh
 share:
  C:\ as C
 
-#### create docker-machine with created iso file on mapt virtula switch
+#### create docker-machine with created iso file on napt virtual switch
 ```cmd
 cd <created.iso dir>
 sudo docker-machine create --driver hyperv --hyperv-virtual-switch HV-NAT-192168199000 --hyperv-cpu-count 2  --hyperv-boot2docker-url boot2docker.cifs.iso default
 ```
 
-## on vEthernet (default) with DNCP
+#### configure vm
+change memory
+e.g.) 1G -> 1.5G
 
-In Hyper-V manager, change virtual switch from 'hv-nat' to 'default switch'.
-Because defautl switch can provide dhcp/nat/dns server to vm.
+initialize
+  in vm, exec script for initialization
+  ```bash
+  sudo bash /opt/prepare.bash
+  ```
 
-In boot2docker-cifs vm on Hyper-V:
-```bash
-sudo bash /opt/mnt_c.bash
-sudo df -h
-ls -F /c
-```
-
-Trouble:
+### Trouble:
 1) failed to acccess to server on created docker container.
    check dnsserver lines in /etc/resolv.conf  
